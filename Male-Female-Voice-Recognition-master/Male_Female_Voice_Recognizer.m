@@ -1,71 +1,62 @@
 clc;close all;
-%clear all
+clear all
 %% Reading the audio
-[y ,Fs]=audioread('samples/male.ogg'); % Read the audio sample
-frame=3500; % Set the frame rate
+[y ,Fs]=audioread('samples/male.ogg'); % Read the audio sample (male.ogg | female.ogg)
+frame=3500; % Set the frame rate to 3500
+n = 3;  % nth order (3 is optimum value, the other values may lead to inaccuracy)
+
+%% Frequency response of input signal
+figure
 freqz(y);
 
-% Plot the frequency response of the filtered signal
-
-[b0,a0]=mybutter(350/(Fs/2)); % Get the coefficient of the filter matrix
-%freqz(b0, a0);
+figure
+freqss = freq(y);
+%% Find coefficients of each filter
+[b0_ch,a0_ch]=cheby1(n-1,3,260/(Fs/2));
+[b0_b,a0_b]=butter(n-1,260/(Fs/2));% Get the coefficient of the filter matrix
+[b0_el,a0_el] = ellip(n-1,10,50,260/(Fs/2));
 
 %% In-built pitch function
 
-f0 = pitch(audioIn,Fs);
-%disp(f0);   %display of all frequencies of the pitch
+f0 = pitch(y,Fs);
 b=mean(f0); % the value of mean of all frequencies of the pitch
-%disp(b);     % display the value
 
+figure
+tiledlayout(2,1)
+
+nexttile
+t = (0:length(y)-1)/Fs;
+plot(t,y)
+xlabel("Time (s)")
+ylabel("Amplitude")
+grid minor
+axis tight
+
+nexttile
+pitch(y,frame);
+
+%% Plot frequency responses of each filter
+
+figure
+freqz(b0_b, a0_b);
+figure
+freqz(b0_ch, a0_ch);
+figure
+freqz(b0_el, a0_el);
 
 %% Identify the frequency of each frame
-for i=1:length(y)/frame
-    x=y(1+(i-1)*frame:i*frame);
-    xin = abs(x);
-    xin=myfilter(b0,a0,xin);    
-    xin = xin-mean(xin);   
-    x_out(1+(i-1)*frame:i*frame,1)=xin;
-    x2=zeros(length(xin),1);
-    x2(1:length(x)-1)=xin(2:length(x));
-    zc=length(find((xin>0 & x2<0) | (xin<0 & x2>0)));
-    F0(i)=0.5*Fs*zc/length(x);
-    
-end
-Fx=mean(F0); % Take mean of all the frequency for each frame
 
-%% Display the output frequency
- % Use the function freq to find the frequency
-fprintf('Estimated frequency by in-built function is %3.2f Hz.\n', ...
-    mean(freq(y)));
+butter_filter = iden_frame(y,Fs,b0_b,a0_b, frame,n);
+cheby_filter = iden_frame(y,Fs,b0_ch,a0_ch, frame,n);
+elliptic_filter = iden_frame(y,Fs,b0_el,a0_el, frame,n);
 
 %% Display the final Gender
 
-
-if b>165
-inbuilt = "Female Voice";
-else
-inbuilt = 'Male Voice';
-end
-fprintf('In-built pitch function: %s \n ', inbuilt);
- 
+output(b, "pitch function");
+output(mean(freq(y)), "customized pitch function");
+output(butter_filter, "butter_filter");
+output(cheby_filter,"cheby_filter" );
+output(elliptic_filter, "elliptic_filter");
 
 
 
-disp("mean(F0)")
-if Fx>165   % set the threshold
-    meanF0 = 'Female Voice';
-else
-    meanF0 = 'Male Voice';
-
-end
-fprintf(' Estimated frequency (Fx=mean(F0)) is %3.2f Hz.\n',Fx);
-
-
-
-disp("(mean(freq(y))))")
-if mean(freq(y))>165   % set the threshold
-    fprintf('Female Voice\n');
-else
-    fprintf('Male Voice\n');
-
-end
