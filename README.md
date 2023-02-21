@@ -3,7 +3,7 @@ Recognize whether the voice is of a male ar female.
 
 ## Introduction
 
-The fundamental frequency of a typical male ranges somewhere from  85 Hz to 180 Hz. While, the fundamental frequency of a typical female ranges somewhere from 165 Hz to 260 Hz.
+The fundamental frequency of a typical male ranges somewhere from  85 Hz to 165 Hz. While, the fundamental frequency of a typical female ranges somewhere from 165 Hz to 260 Hz. (In real-world frequencies for male and female might have a bit different range of frequency due to human-biological factors).
 
 ### Method 1 - Using in-built pitch function
                                                     [f0,inx] = pitch(audioIn,fs)
