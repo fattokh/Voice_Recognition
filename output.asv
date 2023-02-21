@@ -1,0 +1,13 @@
+%% Identify the frequency of each frame
+
+function output(filter, name)
+
+if filter>165   % set the threshold
+    output = 'Female Voice';
+else
+    output = 'Male Voice';
+    
+fprintf('Estimated frequency %s is %3.2f Hz. %s\n',name,filter, output);
+
+
+end
