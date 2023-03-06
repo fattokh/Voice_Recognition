@@ -2,7 +2,7 @@
 close all;
 clear all
 %% Reading the audio
-[y ,Fs]=audioread('samples/male.ogg'); % Read the audio sample (male.ogg | female.ogg)
+[y ,Fs]=audioread('samples/female.ogg'); % Read the audio sample (male.ogg | female.ogg)
 frame=3500; % Set the frame rate to 3500 for sampling our audio in iden_frame function
 %sound(y,Fs);
 %% Frequency response of input signal
@@ -61,7 +61,7 @@ output(cheby_filter2,"cheby_filter type-2" );
 output(elliptic_filter, "elliptic_filter");
 
 %% Plot frequency responses of each filter
-
+%{
 figure;
 freqz(b_b,a_b);
 figure;
@@ -70,10 +70,9 @@ figure;
 freqz(b_ch2,a_ch2);
 figure;
 freqz(b_el,a_el);
+%}
 
-%{
 h_b = fvtool(b_b,a_b);
 h_ch = fvtool(b_ch1,a_ch1);
 h_ch2 = fvtool(b_ch2,a_ch2);
 h_el = fvtool(b_el,a_el);
-%}
